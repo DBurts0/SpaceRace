@@ -11,17 +11,11 @@ using namespace std;
 mutex m;
 string userText;
 
-int ranNum;
-
-int launchLocation(int num)
-{
-	num = rand() % 2;
-	return num;
-}
-
 void intro()
 {
+	// Give a brief introduction to the program
 	cout << "Welcome to the launch control room.\n";
+	// Pause to give the user time to read
 	Sleep(3000);
 	cout << "This is a very important operation as multiple rockets are expected to take off today.\n";
 	Sleep(5000);
@@ -36,18 +30,18 @@ void timer(int seconds)
 {
 	for (int s = -1; s <= seconds; s++)
 	{
-		// pause for 1 second
-		Sleep(1000);
+		
 		// print the current amount of seconds left in the timer
 		cout << seconds << endl;
 		seconds -= 1;
+		// pause for 1 second
+		Sleep(1000);
 	}
-	Sleep(1000);
 }
 
 void rocketLaunch(int i, int location)
 {
-	launchLocation(location);
+	// Only allow one thread at a time to execute the function
 	m.lock();
 	if (location == 0)
 	{
@@ -60,18 +54,18 @@ void rocketLaunch(int i, int location)
 	// countdown from 3 seconds
 	timer(3);
 	cout << "Launched!\n";
-	// clear the value of userText so the while loop will run the next time its called
+	// Unlock so the next thread can access the function
 	m.unlock();
 }
 
 int main()
 {
 	intro();
-	srand(time(0));
 	cout << "Preparing to launch all available rockets.\n";
-	ranNum = 0;
-	rocketLaunch(1, ranNum);
+	// Launch a rocket from the main thread
+	rocketLaunch(1, 0);
 	Sleep(3000);
+	
 	cout << "Error! Main base has lost remote access to the launch controls.\n";
 	cout << "Preparing to swap control to the local base.\n";
 	cout << "Enter 'swap' to begin controlling the launch from the local base.\n";
@@ -79,18 +73,18 @@ int main()
 	{
 		cin >> userText;
 	}
-	ranNum = 1;
-	thread rocket1(rocketLaunch, 2, ranNum);
-	thread rocket2(rocketLaunch, 3, ranNum);
-	thread rocket3(rocketLaunch, 4, ranNum);
-	thread rocket4(rocketLaunch, 5, ranNum);
-	thread rocket5(rocketLaunch, 6, ranNum);
-	thread rocket6(rocketLaunch, 7, ranNum);
-	thread rocket7(rocketLaunch, 8, ranNum);
-	thread rocket8(rocketLaunch, 9, ranNum);
-	thread rocket9(rocketLaunch, 10, ranNum);
+	// Begin launching rockets from the child threads
+	thread rocket1(rocketLaunch, 2, 1);
+	thread rocket2(rocketLaunch, 3, 1);
+	thread rocket3(rocketLaunch, 4, 1);
+	thread rocket4(rocketLaunch, 5, 1);
+	thread rocket5(rocketLaunch, 6, 1);
+	thread rocket6(rocketLaunch, 7, 1);
+	thread rocket7(rocketLaunch, 8, 1);
+	thread rocket8(rocketLaunch, 9, 1);
+	thread rocket9(rocketLaunch, 10, 1);
 
-
+	// Wait for each thread to finish before continuing
 	rocket9.join();
 	rocket8.join();
 	rocket7.join();
